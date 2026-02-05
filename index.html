@@ -2,148 +2,146 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>擬真 3D 骰子</title>
+    <title>幸運骰子排名榜</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background: radial-gradient(circle, #2c3e50, #000000);
-            color: white;
-        }
-
-        .dice-container {
-            display: flex;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        /* 骰子本體 */
-        .dice {
-            width: 100px;
-            height: 100px;
-            background-color: #f0f0f0;
-            border-radius: 15px;
-            display: grid;
-            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-            padding: 10px;
-            box-sizing: border-box;
-            box-shadow: inset 0 5px 15px rgba(255,255,255,0.5), 
-                        5px 10px 20px rgba(0,0,0,0.5);
-        }
-
-        /* 骰子點子 */
-        .dot {
-            width: 18px;
-            height: 18px;
-            background-color: #333;
-            border-radius: 50%;
-            align-self: center;
-            justify-self: center;
-            visibility: hidden; /* 預設隱藏 */
-        }
-
-        /* 點數為 1 時，中間點紅 */
-        .dice[data-value="1"] .dot:nth-child(5) { visibility: visible; background-color: #e74c3c; width: 24px; height: 24px; }
+        :root { --primary: #e74c3c; --bg: #1a1a1a; }
+        body { font-family: sans-serif; background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         
-        /* 點數為 2 */
-        .dice[data-value="2"] .dot:nth-child(1),
-        .dice[data-value="2"] .dot:nth-child(9) { visibility: visible; }
-
-        /* 點數為 3 */
-        .dice[data-value="3"] .dot:nth-child(1),
-        .dice[data-value="3"] .dot:nth-child(5),
-        .dice[data-value="3"] .dot:nth-child(9) { visibility: visible; }
-
-        /* 點數為 4 */
-        .dice[data-value="4"] .dot:nth-child(1), .dice[data-value="4"] .dot:nth-child(3),
-        .dice[data-value="4"] .dot:nth-child(7), .dice[data-value="4"] .dot:nth-child(9) { visibility: visible; }
-
-        /* 點數為 5 */
-        .dice[data-value="5"] .dot:nth-child(1), .dice[data-value="5"] .dot:nth-child(3),
-        .dice[data-value="5"] .dot:nth-child(5),
-        .dice[data-value="5"] .dot:nth-child(7), .dice[data-value="5"] .dot:nth-child(9) { visibility: visible; }
-
-        /* 點數為 6 */
-        .dice[data-value="6"] .dot:nth-child(1), .dice[data-value="6"] .dot:nth-child(3),
-        .dice[data-value="6"] .dot:nth-child(4), .dice[data-value="6"] .dot:nth-child(6),
-        .dice[data-value="6"] .dot:nth-child(7), .dice[data-value="6"] .dot:nth-child(9) { visibility: visible; }
-
-        /* 動態 */
-        .rolling {
-            animation: roll 0.4s ease-in-out infinite;
-        }
-
-        @keyframes roll {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(0.9); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        button {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.5rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: bold;
-        }
-
-        button:hover { background: #c0392b; transform: scale(1.05); }
+        /* 骰子與佈局 */
+        .dice-container { display: flex; gap: 20px; margin: 20px 0; }
+        .dice { width: 80px; height: 80px; background: #eee; border-radius: 12px; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 8px; box-sizing: border-box; }
+        .dot { width: 14px; height: 14px; background: #333; border-radius: 50%; visibility: hidden; align-self: center; justify-self: center; }
         
-        #result-text { margin-top: 20px; font-size: 1.2rem; min-height: 1.5em; }
+        /* 顯示邏輯 (1-6 點) */
+        .dice[data-v="1"] .dot:nth-child(5) { visibility: visible; background: red; }
+        .dice[data-v="2"] .dot:nth-child(1), .dice[data-v="2"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-v="3"] .dot:nth-child(1), .dice[data-v="3"] .dot:nth-child(5), .dice[data-v="3"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-v="4"] .dot:nth-child(1), .dice[data-v="4"] .dot:nth-child(3), .dice[data-v="4"] .dot:nth-child(7), .dice[data-v="4"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-v="5"] .dot:nth-child(1), .dice[data-v="5"] .dot:nth-child(3), .dice[data-v="5"] .dot:nth-child(5), .dice[data-v="5"] .dot:nth-child(7), .dice[data-v="5"] .dot:nth-child(9) { visibility: visible; }
+        .dice[data-v="6"] .dot:nth-child(1), .dice[data-v="6"] .dot:nth-child(3), .dice[data-v="6"] .dot:nth-child(4), .dice[data-v="6"] .dot:nth-child(6), .dice[data-v="6"] .dot:nth-child(7), .dice[data-v="6"] .dot:nth-child(9) { visibility: visible; }
+
+        /* 表單與按鈕 */
+        .ui-card { background: #2c3e50; padding: 20px; border-radius: 15px; text-align: center; width: 300px; }
+        input { padding: 8px; width: 80%; margin-bottom: 10px; border-radius: 5px; border: none; }
+        button { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%; }
+        button:disabled { background: #777; cursor: not-allowed; }
+        
+        /* 排名榜 */
+        .rank-board { margin-top: 30px; width: 300px; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; }
+        .rank-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #444; }
+        
+        .admin-panel { margin-top: 20px; display: none; }
+        .rolling { animation: shake 0.2s infinite; }
+        @keyframes shake { 0% {transform: rotate(3deg)} 50% {transform: rotate(-3deg)} 100% {transform: rotate(3deg)} }
     </style>
 </head>
 <body>
 
-    <div class="dice-container">
-        <div id="d1" class="dice" data-value="1">
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <h2>🎲 骰子最高分挑戰賽</h2>
+
+    <div class="ui-card">
+        <input type="text" id="userName" placeholder="請輸入你的名字">
+        <div id="chanceInfo">剩餘次數：3</div>
+        
+        <div class="dice-container">
+            <div class="dice" id="d1" data-v="1"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="dice" id="d2" data-v="1"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="dice" id="d3" data-v="1"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
         </div>
-        <div id="d2" class="dice" data-value="1">
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div id="d3" class="dice" data-value="1">
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+
+        <button id="rollBtn" onclick="handleRoll()">擲骰子！</button>
+        
+        <div id="adminPanel" class="admin-panel">
+            <button onclick="resetData()" style="background: #27ae60;">🛠️ 管理員：清除所有紀錄</button>
         </div>
     </div>
 
-    <button onclick="rollAll()">擲骰子！</button>
-    <div id="result-text">準備好了嗎？</div>
+    <div class="rank-board">
+        <h3>🏆 排名榜 (最高分)</h3>
+        <div id="rankList"></div>
+    </div>
 
     <script>
-        function rollAll() {
-            const dices = document.querySelectorAll('.dice');
-            const resultText = document.getElementById('result-text');
+        let scores = JSON.parse(localStorage.getItem('diceScores')) || {};
+        const MAX_CHANCES = 3;
+
+        // 監聽名字輸入，如果是 Jimmy 就顯示隱藏按鈕
+        document.getElementById('userName').addEventListener('input', (e) => {
+            document.getElementById('adminPanel').style.display = (e.target.value === "Jimmy") ? "block" : "none";
+            updateUI();
+        });
+
+        function updateUI() {
+            const name = document.getElementById('userName').value.trim();
+            const btn = document.getElementById('rollBtn');
+            const info = document.getElementById('chanceInfo');
             
-            // 開始滾動動畫
+            if (!name) {
+                btn.disabled = true;
+                info.innerText = "請先輸入名字";
+                return;
+            }
+
+            const userData = scores[name] || { count: 0, max: 0 };
+            const remains = MAX_CHANCES - userData.count;
+            info.innerText = `剩餘次數：${remains}`;
+            btn.disabled = remains <= 0;
+            renderRank();
+        }
+
+        function handleRoll() {
+            const name = document.getElementById('userName').value.trim();
+            if (!name) return;
+
+            const dices = document.querySelectorAll('.dice');
             dices.forEach(d => d.classList.add('rolling'));
-            resultText.innerText = "正在擲出...";
+            document.getElementById('rollBtn').disabled = true;
 
             setTimeout(() => {
-                let total = 0;
+                let currentTotal = 0;
                 dices.forEach(d => {
                     d.classList.remove('rolling');
                     const val = Math.floor(Math.random() * 6) + 1;
-                    d.setAttribute('data-value', val);
-                    total += val;
+                    d.setAttribute('data-v', val);
+                    currentTotal += val;
                 });
-                resultText.innerText = `點數總和：${total}`;
+
+                // 更新資料
+                if (!scores[name]) scores[name] = { count: 0, max: 0 };
+                scores[name].count += 1;
+                if (currentTotal > scores[name].max) {
+                    scores[name].max = currentTotal;
+                }
+
+                localStorage.setItem('diceScores', JSON.stringify(scores));
+                updateUI();
             }, 600);
         }
+
+        function renderRank() {
+            const list = document.getElementById('rankList');
+            const sorted = Object.entries(scores)
+                .sort((a, b) => b[1].max - a[1].max)
+                .slice(0, 10); // 取前十名
+
+            list.innerHTML = sorted.map(([name, data], index) => `
+                <div class="rank-item">
+                    <span>${index + 1}. ${name}</span>
+                    <span>最高 ${data.max} 點</span>
+                </div>
+            `).join('');
+        }
+
+        function resetData() {
+            if (confirm("確定要清除所有玩家紀錄嗎？")) {
+                localStorage.clear();
+                scores = {};
+                updateUI();
+                alert("已清除完成");
+            }
+        }
+
+        updateUI(); // 初始呼叫
     </script>
 </body>
 </html>
