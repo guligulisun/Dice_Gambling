@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>擬真 3D 骰子</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: radial-gradient(circle, #2c3e50, #000000);
+            color: white;
+        }
+
+        .dice-container {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        /* 骰子本體 */
+        .dice {
+            width: 100px;
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            padding: 10px;
+            box-sizing: border-box;
+            box-shadow: inset 0 5px 15px rgba(255,255,255,0.5), 
+                        5px 10px 20px rgba(0,0,0,0.5);
+        }
+
+        /* 骰子點子 */
+        .dot {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+            align-self: center;
+            justify-self: center;
+            visibility: hidden; /* 預設隱藏 */
+        }
+
+        /* 點數為 1 時，中間點紅 */
+        .dice[data-value="1"] .dot:nth-child(5) { visibility: visible; background-color: #e74c3c; width: 24px; height: 24px; }
+        
+        /* 點數為 2 */
+        .dice[data-value="2"] .dot:nth-child(1),
+        .dice[data-value="2"] .dot:nth-child(9) { visibility: visible; }
+
+        /* 點數為 3 */
+        .dice[data-value="3"] .dot:nth-child(1),
+        .dice[data-value="3"] .dot:nth-child(5),
+        .dice[data-value="3"] .dot:nth-child(9) { visibility: visible; }
+
+        /* 點數為 4 */
+        .dice[data-value="4"] .dot:nth-child(1), .dice[data-value="4"] .dot:nth-child(3),
+        .dice[data-value="4"] .dot:nth-child(7), .dice[data-value="4"] .dot:nth-child(9) { visibility: visible; }
+
+        /* 點數為 5 */
+        .dice[data-value="5"] .dot:nth-child(1), .dice[data-value="5"] .dot:nth-child(3),
+        .dice[data-value="5"] .dot:nth-child(5),
+        .dice[data-value="5"] .dot:nth-child(7), .dice[data-value="5"] .dot:nth-child(9) { visibility: visible; }
+
+        /* 點數為 6 */
+        .dice[data-value="6"] .dot:nth-child(1), .dice[data-value="6"] .dot:nth-child(3),
+        .dice[data-value="6"] .dot:nth-child(4), .dice[data-value="6"] .dot:nth-child(6),
+        .dice[data-value="6"] .dot:nth-child(7), .dice[data-value="6"] .dot:nth-child(9) { visibility: visible; }
+
+        /* 動態 */
+        .rolling {
+            animation: roll 0.4s ease-in-out infinite;
+        }
+
+        @keyframes roll {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(0.9); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        button:hover { background: #c0392b; transform: scale(1.05); }
+        
+        #result-text { margin-top: 20px; font-size: 1.2rem; min-height: 1.5em; }
+    </style>
+</head>
+<body>
+
+    <div class="dice-container">
+        <div id="d1" class="dice" data-value="1">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div id="d2" class="dice" data-value="1">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div id="d3" class="dice" data-value="1">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+    </div>
+
+    <button onclick="rollAll()">擲骰子！</button>
+    <div id="result-text">準備好了嗎？</div>
+
+    <script>
+        function rollAll() {
+            const dices = document.querySelectorAll('.dice');
+            const resultText = document.getElementById('result-text');
+            
+            // 開始滾動動畫
+            dices.forEach(d => d.classList.add('rolling'));
+            resultText.innerText = "正在擲出...";
+
+            setTimeout(() => {
+                let total = 0;
+                dices.forEach(d => {
+                    d.classList.remove('rolling');
+                    const val = Math.floor(Math.random() * 6) + 1;
+                    d.setAttribute('data-value', val);
+                    total += val;
+                });
+                resultText.innerText = `點數總和：${total}`;
+            }, 600);
+        }
+    </script>
+</body>
+</html>
